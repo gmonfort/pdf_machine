@@ -5,10 +5,6 @@ Cuba.use Rack::Session::Cookie, :secret => "9461c163cbc13617358e50fdbd24ec7fd0ab
 Cuba.use Rack::Protection
 Cuba.use Rack::Protection::RemoteReferrer
 
-if ENV["RACK_ENV"] == "production"
-  Cuba.use Rack::SSL
-end
-
 Cuba.define do
   on get do
     # on "admin" do
