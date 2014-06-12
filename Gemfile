@@ -5,7 +5,7 @@ ruby "1.9.3"
 gem "cuba", "~> 3.1"
 gem "cuba-sendfile", "~> 0.0.2"
 gem "rack-protection", "~> 1.5"
-gem "rack-ssl"
+gem "tilt"
 
 gem "rake", "~> 10.1"
 gem "puma", "~> 2.8"
