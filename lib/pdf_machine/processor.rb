@@ -22,18 +22,82 @@ module PDFMachine
 
     private
 
+    def working_directory
+      @working_directory ||= File.dirname(File.expand_path(@svg))
+    end
+
+    def to_pixbuf_with_cairo(input, ratio)
+      handle = nil
+      Dir.chdir(File.dirname(File.expand_path(input))) do
+        handle = RSVG::Handle.new_from_file(input)
+      end
+      dim = handle.dimensions
+      width = dim.width * ratio
+      height = dim.height * ratio
+      surface = Cairo::ImageSurface.new(Cairo::FORMAT_ARGB32, width, height)
+      cr = Cairo::Context.new(surface)
+      cr.scale(ratio, ratio)
+      cr.render_rsvg_handle(handle)
+      temp = Tempfile.new("svg2")
+      cr.target.write_to_png(temp.path)
+      cr.target.finish
+      Gdk::Pixbuf.new(temp.path)
+    end
+
     def handle
-      @handle ||= (input_type == :data) ? RSVG::Handle.new_from_data(@svg) : RSVG::Handle.new_from_file(@svg)
+      # @handle ||= (input_type == :data) ? RSVG::Handle.new_from_data(@svg) : RSVG::Handle.new_from_file(@svg)
+      if input_type == :data
+        @handle = RSVG::Handle.new_from_data(@svg)
+      else
+        Dir.chdir(working_directory) do |dir|
+          @handle = RSVG::Handle.new_from_file(File.basename(@svg))
+        end
+      end
+      @handle
     end
 
     def input_type
       (@svg.is_a?(String) && File.exists?(@svg)) ? :file : :data
     end
 
+    # Deprecated ...
+    def create_context(arg)
+      # portrait
+      surface = @surface_class.new(arg, @height, @width)
+      context = Cairo::Context.new(surface)
+
+      # rotate 90 degrees clockwise (in radians)
+      context.rotate(Math::PI/2)
+      context.translate(0, -@height)
+
+      context.render_rsvg_handle(handle)
+      context
+    end
+
+    def surface
+      @surface ||= @surface_class.new(output_file, @height, @width)
+    end
+
+    def context
+      @context ||= Cairo::Context.new(surface)
+    end
+
+    def output_file
+      @options[:output_file]
+    end
+
     def render
-      @context = create_context @options[:output_file]
-      @context.target.finish
-      File.new @options[:output_file]
+      # @context = create_context @options[:output_file]
+      # @context.target.finish
+      # File.new @options[:output_file]
+
+      context.rotate(Math::PI/2)
+      context.translate(0, -@height)
+
+      context.render_rsvg_handle(handle)
+
+      context.target.finish
+      File.new(output_file)
     end
 
     def render_image
@@ -60,19 +124,6 @@ module PDFMachine
         when :pdf               then "PDFSurface"
       end
       @surface_class = Cairo.const_get(surface_class_name)
-    end
-
-    def create_context(arg)
-      # portrait
-      surface = @surface_class.new(arg, @height, @width)
-      context = Cairo::Context.new(surface)
-
-      # rotate 90 degrees clockwise (in radians)
-      context.rotate(Math::PI/2)
-      context.translate(0, -@height)
-
-      context.render_rsvg_handle(handle)
-      context
     end
 
     def setup_options(options)

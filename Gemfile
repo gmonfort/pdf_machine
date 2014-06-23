@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby "1.9.3"
+# ruby "1.9.3"
 
 gem "cuba", "~> 3.1"
 gem "cuba-sendfile", "~> 0.0.2"
