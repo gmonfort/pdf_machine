@@ -35,4 +35,19 @@ Cuba.define do
       res.redirect "/pdfs"
     end
   end
+
+  on post, "pngs", param("svg") do |svg_data|
+    begin
+      file = svg_data[:tempfile].path
+      blob = PDFMachine.convert_svg(file, :png)
+
+      res.headers['Content-Type'] = 'image/png'
+      res.headers['Content-Disposition'] = 'attachment; filename="out.pdf"'
+
+      send_file(blob.path)
+    rescue => e
+      puts "****** ERROR --- #{e.inspect}"
+      res.redirect "/pngs"
+    end
+  end
 end
