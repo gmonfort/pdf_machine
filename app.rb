@@ -48,7 +48,7 @@ Cuba.define do
       blob = PDFMachine.convert_svg(file, :png)
 
       res.headers['Content-Type'] = 'image/png'
-      res.headers['Content-Disposition'] = 'attachment; filename="out.pdf"'
+      res.headers['Content-Disposition'] = 'attachment; filename="out.png"'
 
       send_file(blob.path)
     rescue => e
