@@ -21,15 +21,21 @@ Cuba.define do
     res.write view('pdfs/form')
   end
 
-  on post, "pdfs", param("svg") do |svg_data|
+  on post, "pdfs", param("svg"), param("batik") do |svg_data, batik|
     begin
       file = svg_data[:tempfile].path
-      blob = PDFMachine.convert_svg(file, :pdf)
+
+      blob = if batik == "1"
+        PDFMachine.convert_svg_using_batik(file, :pdf)
+      else
+        PDFMachine.convert_svg(file, :pdf)
+      end
 
       res.headers['Content-Type'] = 'application/pdf'
       res.headers['Content-Disposition'] = 'attachment; filename="out.pdf"'
 
       send_file(blob.path)
+
     rescue => e
       puts "****** ERROR --- #{e.inspect}"
       res.redirect "/pdfs"

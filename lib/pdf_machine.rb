@@ -1,5 +1,6 @@
 require "pdf_machine/config"
 require "pdf_machine/processor"
+require "pdf_machine/batik_processor"
 
 module PDFMachine
   class PDFMachineError < StandardError; end
@@ -23,6 +24,13 @@ module PDFMachine
   def self.convert_svg(svg, output_format, options={})
     options   = config.to_hash.merge!(options)
     processor = Processor.new(svg, output_format, options)
+
+    processor.process
+  end
+
+  def self.convert_svg_using_batik(svg, output_format, options={})
+    options   = config.to_hash.merge!(options)
+    processor = BatikProcessor.new(svg, output_format, options)
 
     processor.process
   end
