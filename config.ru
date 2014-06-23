@@ -8,8 +8,8 @@ Bundler.setup(:default, ENV["RACK_ENV"])
 
 require "./app"
 
-use Rack::Auth::Basic, "Please authenticate" do |username, password|
-  username == "red" && password == "stamp"
-end
+# use Rack::Auth::Basic, "Please authenticate" do |username, password|
+#   username == "red" && password == "stamp"
+# end
 
 run Cuba
