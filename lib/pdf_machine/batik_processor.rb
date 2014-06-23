@@ -18,15 +18,19 @@ module PDFMachine
     private
 
     def batik_command
-      command =   ["java -cp #{classpath} Converter"]
+      command =   ["java -cp #{classpath} #{java_wrapper_class}"]
       command <<  "#{svg}"
       command <<  "#{output_file}"
       command.join(' ')
     end
 
+    def java_wrapper_class
+      "Converter"
+    end
+
     def output_file
       # @options[:output_file]
-      "the_output.pdf"
+      "output.pdf"
     end
 
     def working_dir
