@@ -14,7 +14,7 @@ class ConversionTest < MiniTest::Test
 
   def svg
     # "test/fixtures/real_sample1.svg"
-    "test/fixtures/real_sample1_1.svg"
+    "test/fixtures/baby.svg"
   end
 
   def options
