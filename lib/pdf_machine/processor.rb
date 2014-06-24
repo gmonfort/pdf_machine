@@ -96,6 +96,8 @@ module PDFMachine
     end
 
     def setup
+      setup_svg_file
+
       dim     = handle.dimensions
       @ratio  = @options[:ratio]
       @width  = dim.width * @ratio
@@ -108,7 +110,6 @@ module PDFMachine
       end
       @surface_class = Cairo.const_get(surface_class_name)
 
-      setup_svg_file
     end
 
     def setup_svg_file

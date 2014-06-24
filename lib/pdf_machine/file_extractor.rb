@@ -29,8 +29,6 @@ module PDFMachine
           image.attribute('href').value = "file://#{local_path}"
         end
 
-        require "debugger"; debugger
-
       rescue => e
         puts "Error: #{e.inspect}"
       ensure
