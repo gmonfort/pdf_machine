@@ -11,6 +11,8 @@ gem "rake", "~> 10.1"
 gem "puma", "~> 2.8"
 
 gem 'rsvg2'
+gem "nokogiri"
+gem "httparty"
 
 group :development do
   gem "rerun"

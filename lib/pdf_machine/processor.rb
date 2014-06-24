@@ -1,6 +1,7 @@
 require 'securerandom'
 require 'tempfile'
 require "rsvg2"
+require "pdf_machine/file_extractor"
 
 module PDFMachine
   class Processor
@@ -24,24 +25,6 @@ module PDFMachine
 
     def working_directory
       @working_directory ||= File.dirname(File.expand_path(@svg))
-    end
-
-    def to_pixbuf_with_cairo(input, ratio)
-      handle = nil
-      Dir.chdir(File.dirname(File.expand_path(input))) do
-        handle = RSVG::Handle.new_from_file(input)
-      end
-      dim = handle.dimensions
-      width = dim.width * ratio
-      height = dim.height * ratio
-      surface = Cairo::ImageSurface.new(Cairo::FORMAT_ARGB32, width, height)
-      cr = Cairo::Context.new(surface)
-      cr.scale(ratio, ratio)
-      cr.render_rsvg_handle(handle)
-      temp = Tempfile.new("svg2")
-      cr.target.write_to_png(temp.path)
-      cr.target.finish
-      Gdk::Pixbuf.new(temp.path)
     end
 
     def handle
@@ -124,6 +107,13 @@ module PDFMachine
         when :pdf               then "PDFSurface"
       end
       @surface_class = Cairo.const_get(surface_class_name)
+
+      setup_svg_file
+    end
+
+    def setup_svg_file
+      extractor = PDFMachine::FileExtractor.new(@svg)
+      @svg = extractor.fetch_remote_files
     end
 
     def setup_options(options)
