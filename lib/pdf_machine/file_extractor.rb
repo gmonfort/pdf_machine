@@ -12,14 +12,13 @@ module PDFMachine
     def fetch_remote_files
       begin
         f = File.open(svg)
-        @data = Nokogiri::XML(f).remove_namespaces!
+        @data = Nokogiri::XML(f)
         images = (@data / "image")
 
         images.each do |image|
-          # require 'debugger'; debugger
-
           url = image.attribute("href").value
           filename = File.basename(url)
+          filename.gsub!(/[^a-zA-Z0-9\.-_]*/, "")
 
           local_path = "/tmp/#{filename}"
           File.open(local_path, "wb") do |f| 
