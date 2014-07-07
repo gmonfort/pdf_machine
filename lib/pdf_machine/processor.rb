@@ -49,16 +49,24 @@ module PDFMachine
       surface = @surface_class.new(arg, @height, @width)
       context = Cairo::Context.new(surface)
 
-      # rotate 90 degrees clockwise (in radians)
-      context.rotate(Math::PI/2)
-      context.translate(0, -@height)
+      if rotate?
+        # rotate 90 degrees clockwise (in radians)
+        context.rotate(Math::PI/2) if rotate?
+        context.translate(0, -@height)
+      end
 
       context.render_rsvg_handle(handle)
       context
     end
 
     def surface
-      @surface ||= @surface_class.new(output_file, @height, @width)
+      @surface ||= begin
+        if rotate?
+          @surface_class.new(output_file, @height, @width)
+        else
+          @surface_class.new(output_file, @width, @height)
+        end
+      end
     end
 
     def context
@@ -74,13 +82,19 @@ module PDFMachine
       # @context.target.finish
       # File.new @options[:output_file]
 
-      context.rotate(Math::PI/2)
-      context.translate(0, -@height)
+      if rotate?
+        context.rotate(Math::PI/2) 
+        context.translate(0, -@height)
+      end
 
       context.render_rsvg_handle(handle)
 
       context.target.finish
       File.new(output_file)
+    end
+
+    def rotate?
+      @options[:rotate_pdf] == "1"
     end
 
     def render_image
