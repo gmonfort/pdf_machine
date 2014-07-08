@@ -21,14 +21,14 @@ Cuba.define do
     res.write view('pdfs/form')
   end
 
-  on post, "pdfs", param("svg"), param("batik") do |svg_data, batik|
+  on post, "pdfs", param("svg"), param("batik"), param("rotate_pdf") do |svg_data, batik, rotate_pdf|
     begin
       file = svg_data[:tempfile].path
 
       blob = if batik == "1"
         PDFMachine.convert_svg_using_batik(file, :pdf)
       else
-        PDFMachine.convert_svg(file, :pdf)
+        PDFMachine.convert_svg(file, :pdf, {rotate_pdf: rotate_pdf})
       end
 
       res.headers['Content-Type'] = 'application/pdf'
